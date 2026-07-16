@@ -98,3 +98,113 @@ Presenter - презентер содержит основную логику п
 `emit<T extends object>(event: string, data?: T): void` - инициализация события. При вызове события в метод передается название события и объект с данными, который будет использован как аргумент для вызова обработчика.  
 `trigger<T extends object>(event: string, context?: Partial<T>): (data: T) => void` - возвращает функцию, при вызове которой инициализируется требуемое в параметрах событие с передачей в него данных из второго параметра.
 
+## Данные
+
+# Интерфейс IProduct
+Описывает структуру товара, который получаем с сервера.
+
+```
+interface IProduct {
+  id: string;
+  description: string;
+  image: string;
+  title: string;
+  category: string;
+  price: number | null;
+}
+```
+- `id: string `— уникальный идентификатор товара;
+- `description: string `— описание товара; 
+- `image: string `— путь к изображению;
+- `title: string `— название товара; 
+- `category: string `— категория товара;
+- `price: number | null `— цена товара (может отсутствовать).
+
+# Интерфейс IBuyer
+Описывает данные покупателя.
+
+```
+
+interface IBuyer {
+  payment: TPayment;
+  email: string;
+  phone: string;
+  address: string;
+}
+```
+- `payment: TPayment` — способ оплаты; 
+- `email: string`— email покупателя; 
+- `phone: string` — номер телефона покупателя; 
+- `address: string` — адрес доставки.
+
+# Тип TPayment
+Доступные способы оплаты заказа.
+
+```
+
+type TPayment = 'card' | 'cash' | '';
+```
+- `card` — оплата картой;
+- `cash` — оплата при получении;
+- `''`— способ оплаты ещё не выбран.
+
+## Модели данных
+
+# Класс ProductList
+Хранение и управление каталога товаров.
+
+Конструктор: ` constructor()`
+Поля: `items: IProduct[]` — хранит массив всех товаров; 
+`selectedItem: IProduct | null `— хранит товар, выбранный для подробного отображения.
+
+Методы: 
+`setItems(items: IProduct[]): void` —  массив товаров в модели.
+`getItems(): IProduct[]` — возвращает массив всех товаров.
+`getTotal(): number` — возвращает общее количество товаров.
+`getItemById(id: IProduct['id']): IProduct | null` — возвращает товар по идентификатору или null если товара нет.
+`setSelectedItem(item: IProduct | null): void` — сохраняет или сбрасывает выделенный товар для отображения.
+`getSelectedItem(): IProduct | null` — возвращает товар, выбранный для подробного отображения или null если товар не выбран.
+
+# Класс Cart
+Хранит массив товаров, выбранных покупателем для покупки.
+
+Конструктор: `constructor()`
+
+Поля: 
+`items: IProduct[] `— массив товаров в корзине; 
+
+Методы: 
+`getItem(): IProduct[]` — получение массива товаров, которые находятся в корзине; 
+`addItem(item: IProduct): void `— добавление товара; 
+`removeItem(item: IProduct): void` — удаление товара, по его идентификатору; 
+`clear(): void` — очистка корзины; 
+`getTotal(): number` — получение стоимости всех товаров в корзине; 
+`getItemsCount(): number` — возвращает количество товаров в корзине; 
+`hasProduct(id: IProduct['id']): boolean` — проверка наличия товара в корзине по его id, полученного в параметр метода.
+
+## Класс Order
+Хранение данных покупателя и валидация данных при оформлении заказа.
+
+Поля: 
+`payment: TPayment` — вид оплаты; 
+`address: string` — адрес; 
+`phone: string` — телефон; 
+`email: string`— email; 
+
+Методы: 
+`setData(data: Partial<IBuyer>): void` — сохраняет данные покупателя; 
+`getData(): IBuyer` — получение данных покупателя; 
+`clear(): void`— сбрасывает все данные покупателя;
+`validate(): BuyerValidationErrors` — выполняет валидацию всех полей данных покупателя. \
+
+## Слой комуникации
+
+# Класс WebLarekApi
+Конструктор: `constructor(api: IApi)`
+
+Поля: 
+`api: IApi` - Клиент для выполнения HTTP-запросов 
+
+Методы:
+`getProductList(): Promise<TProductListResponse>` — выполняет `GET /product` и возвращает список всех товаров.
+`postOrder(order: TOrder): Promise<TOrderResponse | null>` — выполняет `POST /order` с данными заказа и возвращает ответ сервера.
