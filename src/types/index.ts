@@ -16,11 +16,6 @@ export interface IProduct {
   price: number | null;
 }
 
-export enum EValidationStep {
-    shipping = 0,
-    contacts = 1,
-}
-
 export enum EPayment {
     online = 'online',
     onReceipt = 'onReceipt',
